@@ -17,6 +17,9 @@ def get_posts():
 
 @app.route('/api/posts', methods=['POST'])
 def add_post():
+    """Creates a new blog entry. Expects both title and content. If these are
+     specified, the new post will be returned or an error if the input is
+      invalid."""
     data = request.get_json()
     if not data or not 'title' in data or not 'content' in data:
         return jsonify({'error': 'Both title and content are required'}), 400
@@ -29,6 +32,16 @@ def add_post():
     }
     POSTS.append(new_post)
     return jsonify(new_post), 201
+
+
+@app.route('/api/posts/<int:id>', methods=['DELETE'])
+def delete_post(id):
+    """Handles the deletion of a blog post."""
+    for post in POSTS:
+        if post['id'] == id:
+            POSTS.remove(post)
+            return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
+    return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
 if __name__ == '__main__':
