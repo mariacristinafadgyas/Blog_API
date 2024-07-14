@@ -36,11 +36,29 @@ def add_post():
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
-    """Handles the deletion of a blog post."""
+    """Deletes a post based on the ID specified in the URL. If the post
+     exists, it is deleted, if it does not exist, an error message is
+      returned."""
     for post in POSTS:
         if post['id'] == id:
             POSTS.remove(post)
             return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
+    return jsonify({"message": f"Post with id {id} not found."}), 404
+
+
+@app.route('/api/posts/<int:id>', methods=['PUT'])
+def update(id):
+    """Updates an existing blog post with a new title or content."""
+    data = request.get_json()
+    for post in POSTS:
+        if post['id'] == id:
+            title = data.get('title', post['title'])
+            content = data.get('content', post['content'])
+            post.update({
+                'title': title,
+                'content': content
+            })
+            return jsonify({"message": f"Post with id {id} has been updated successfully."}), 200
     return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
