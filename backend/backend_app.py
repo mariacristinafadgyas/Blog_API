@@ -1,15 +1,18 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
-from datetime import date, datetime
+from datetime import date
+from storage import *
+import os
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-POSTS = [
-    {"id": 1, "title": "First post", "content": "This is the first post.", "author": "Manny", "post_date": "2023-06-07"},
-    {"id": 2, "title": "Second post", "content": "This is the post.", "author": "Manny", "post_date": "2023-06-07"},
-]
+current_directory = os.path.dirname(os.path.abspath(__file__))  # Define the path to posts.json
+posts_file_path = os.path.join(current_directory, '..', 'posts.json')
+# print(current_directory)
+# print(posts_file_path)
+POSTS = read_data(posts_file_path)  # Use the updated file path
 
 
 @app.route('/api/posts', methods=['GET'])
@@ -24,8 +27,8 @@ def get_posts():
         return jsonify(POSTS), 200
 
     if sort not in ['title', 'content', 'author', 'post_date'] or direction not in ['asc', 'desc']:
-        return jsonify({'error': 'To sort please select: title or content and'
-                                 ' direction: asc or desc'}), 400
+        return jsonify({'error': 'To sort please select: title / content /'
+                                 ' author / post_date and direction: asc or desc'}), 400
 
     if sort == 'title':
         if direction == 'asc':
@@ -69,6 +72,7 @@ def add_post():
         'post_date': date.today().strftime('%Y-%m-%d')
     }
     POSTS.append(new_post)
+    sync_data('posts.json', POSTS)
     return jsonify(new_post), 201
 
 
@@ -82,6 +86,7 @@ def delete_post(id):
             POSTS.remove(post)
             return jsonify({"message": f"Post with id {id} has been deleted"
                                        f" successfully."}), 200
+    sync_data('posts.json', POSTS)
     return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
@@ -95,12 +100,14 @@ def update(id):
             content = data.get('content', post['content'])
             author = data.get('author', post['author'])
             post_date = date.today().strftime('%Y-%m-%d')
-            post.update({
+            updated_post = {
                 'title': title,
                 'content': content,
                 'author': author,
                 'post_date': post_date
-            })
+            }
+            post.update(updated_post)
+            update_post_in_json('posts.json', updated_post)
             return jsonify({"message": f"Post with id {id} has been updated "
                                        f"successfully."}), 200
     return jsonify({"message": f"Post with id {id} not found."}), 404
@@ -123,7 +130,7 @@ def search_posts():
         if ((title and title.lower() in post['title'].lower()) or
                 (content and content.lower() in post['content'].lower())
                 or (author and author.lower() in post['author'].lower())
-                or post_date == post['post_date']):
+                or (post_date and post_date == post['post_date'])):
             filtered_posts.append(post)
         if filtered_posts:
             return jsonify(filtered_posts), 200
@@ -142,14 +149,14 @@ def search_posts():
     return jsonify({"message": f"No posts found with the {error_message}"}), 404
 
 
-SWAGGER_URL="/api/docs"  # (1) swagger endpoint e.g. HTTP://localhost:5002/api/docs
-API_URL="/static/blog.json" # (2) ensure you create this dir and file
+SWAGGER_URL = "/api/docs"  # (1) swagger endpoint e.g. HTTP://localhost:5002/api/docs
+API_URL = "/static/blog.json"  # (2) ensure you create this dir and file
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': 'Blog API' # (3) You can change this if you like
+        'app_name': 'Blog API'  # (3) You can change this if you like
     }
 )
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
