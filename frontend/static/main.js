@@ -27,7 +27,9 @@ function loadPosts() {
             data.forEach(post => {
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
-                postDiv.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>
+                postDiv.innerHTML = `<h2>${post.title}</h2>
+                <p><small>By: <strong>${post.author}</strong> on ${post.post_date}</small></p>
+                <p>${post.content}</p>
                 <button onclick="deletePost(${post.id})">Delete</button>`;
                 postContainer.appendChild(postDiv);
             });
@@ -41,12 +43,18 @@ function addPost() {
     var baseUrl = document.getElementById('api-base-url').value;
     var postTitle = document.getElementById('post-title').value;
     var postContent = document.getElementById('post-content').value;
+    var postAuthor = document.getElementById('post-author').value || 'Anonymous';
+    var postDate = new Date().toISOString().split('T')[0];  // Formats the date as 'YYYY-MM-DD'
 
     // Use the Fetch API to send a POST request to the /posts endpoint
     fetch(baseUrl + '/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: postTitle, content: postContent })
+        body: JSON.stringify({
+            title: postTitle,
+            content: postContent,
+            author: postAuthor,
+            post_date: postDate })
     })
     .then(response => response.json())  // Parse the JSON data from the response
     .then(post => {

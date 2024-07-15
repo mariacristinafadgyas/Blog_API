@@ -21,11 +21,13 @@ body {
 
 .input-field {
     display: flex;
-    align-items: center;
+    flex-direction: column; /* Change to column to stack items vertically */
+    align-items: stretch; /* Ensure items stretch to fill container width */
     margin-bottom: 20px;
 }
 
 .input-field input,
+.input-field textarea,
 .input-field button {
     height: 40px;
     padding: 10px;
@@ -34,11 +36,17 @@ body {
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.5s ease;
+    margin-bottom: 10px;
+}
+
+.input-field textarea {
+    height: auto; /* Allow the textarea to grow vertically */
+    resize: vertical; /* Allow only vertical resizing */
 }
 
 .input-field input {
     flex-grow: 1;
-    margin-right: 10px;
+    margin-right: 0px;
 }
 
 .input-field input::placeholder {
@@ -49,6 +57,7 @@ body {
     background-color: #4466ee;
     color: #fff;
     cursor: pointer;
+    width: 100px;
 }
 
 .input-field button:hover {
