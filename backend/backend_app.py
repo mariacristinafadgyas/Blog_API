@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
+from datetime import date, datetime
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
 POSTS = [
-    {"id": 1, "title": "First post", "content": "This is the first post."},
-    {"id": 2, "title": "Second post", "content": "This is the post."},
+    {"id": 1, "title": "First post", "content": "This is the first post.", "author": "Manny", "post_date": "2023-06-07"},
+    {"id": 2, "title": "Second post", "content": "This is the post.", "author": "Manny", "post_date": "2023-06-07"},
 ]
 
 
@@ -22,7 +23,7 @@ def get_posts():
     if not sort and not direction:
         return jsonify(POSTS), 200
 
-    if sort not in ['title', 'content'] or direction not in ['asc', 'desc']:
+    if sort not in ['title', 'content', 'author', 'post_date'] or direction not in ['asc', 'desc']:
         return jsonify({'error': 'To sort please select: title or content and'
                                  ' direction: asc or desc'}), 400
 
@@ -36,6 +37,16 @@ def get_posts():
             sorted_posts = sorted(POSTS, key=lambda x: x['content'])
         elif direction == 'desc':
             sorted_posts = sorted(POSTS, key=lambda x: x['content'], reverse=True)
+    elif sort == 'author':
+        if direction == 'asc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['author'])
+        elif direction == 'desc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['author'], reverse=True)
+    elif sort == 'post_date':
+        if direction == 'asc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['post_date'])
+        elif direction == 'desc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['post_date'], reverse=True)
 
     return jsonify(sorted_posts), 200
 
@@ -53,7 +64,9 @@ def add_post():
     new_post = {
         'id': new_id,
         'title': data['title'],
-        'content': data['content']
+        'content': data['content'],
+        'author': data.get('author', 'Anonymous'),
+        'post_date': date.today().strftime('%Y-%m-%d')
     }
     POSTS.append(new_post)
     return jsonify(new_post), 201
@@ -80,9 +93,13 @@ def update(id):
         if post['id'] == id:
             title = data.get('title', post['title'])
             content = data.get('content', post['content'])
+            author = data.get('author', post['author'])
+            post_date = date.today().strftime('%Y-%m-%d')
             post.update({
                 'title': title,
-                'content': content
+                'content': content,
+                'author': author,
+                'post_date': post_date
             })
             return jsonify({"message": f"Post with id {id} has been updated "
                                        f"successfully."}), 200
@@ -95,14 +112,18 @@ def search_posts():
      message if no search parameters are specified or if no matches are found."""
     title = request.args.get('title')
     content = request.args.get('content')
+    author = request.args.get('author')
+    post_date = request.args.get('post_date')
 
-    if not title and not content:
-        return jsonify({"message": "Please provide a title or content to search."}), 400
+    if not title and not content and not author and not post_date:
+        return jsonify({"message": "Please provide a title/content/author/date to search."}), 400
 
     filtered_posts = []
     for post in POSTS:
         if ((title and title.lower() in post['title'].lower()) or
-                (content and content.lower() in post['content'].lower())):
+                (content and content.lower() in post['content'].lower())
+                or (author and author.lower() in post['author'].lower())
+                or post_date == post['post_date']):
             filtered_posts.append(post)
         if filtered_posts:
             return jsonify(filtered_posts), 200
@@ -112,6 +133,10 @@ def search_posts():
         error_message_parts.append(f"title: '{title}'")
     if content:
         error_message_parts.append(f"content: '{content}'")
+    if author:
+        error_message_parts.append(f"author: '{author}'")
+    if post_date:
+        error_message_parts.append(f"date: '{post_date}'")
     error_message = " or ".join(error_message_parts)
 
     return jsonify({"message": f"No posts found with the {error_message}"}), 404
