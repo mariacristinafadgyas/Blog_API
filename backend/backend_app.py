@@ -12,7 +12,31 @@ POSTS = [
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
-    return jsonify(POSTS)
+    """Returns a JSON file containing the list of blog posts. Optionally, it
+     can sort the list of posts according to the specified attribute and
+      direction."""
+    sort = request.args.get('sort')
+    direction = request.args.get('direction')
+
+    if not sort and not direction:
+        return jsonify(POSTS), 200
+
+    if sort not in ['title', 'content'] or direction not in ['asc', 'desc']:
+        return jsonify({'error': 'To sort please select: title or content and'
+                                 ' direction: asc or desc'}), 400
+
+    if sort == 'title':
+        if direction == 'asc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['title'])
+        elif direction == 'desc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['title'], reverse=True)
+    elif sort == 'content':
+        if direction == 'asc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['content'])
+        elif direction == 'desc':
+            sorted_posts = sorted(POSTS, key=lambda x: x['content'], reverse=True)
+
+    return jsonify(sorted_posts), 200
 
 
 @app.route('/api/posts', methods=['POST'])
@@ -42,7 +66,8 @@ def delete_post(id):
     for post in POSTS:
         if post['id'] == id:
             POSTS.remove(post)
-            return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
+            return jsonify({"message": f"Post with id {id} has been deleted"
+                                       f" successfully."}), 200
     return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
@@ -58,7 +83,8 @@ def update(id):
                 'title': title,
                 'content': content
             })
-            return jsonify({"message": f"Post with id {id} has been updated successfully."}), 200
+            return jsonify({"message": f"Post with id {id} has been updated "
+                                       f"successfully."}), 200
     return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
