@@ -34,15 +34,20 @@ def sync_data(file_path, posts_data):
 def update_post_in_json(file_path, updated_post):
     """Updates the post in the JSON file"""
     posts_data = read_data(file_path)
+    post_found = False
     for post in posts_data:
         if post['id'] == updated_post['id']:
             post['title'] = updated_post['title']
             post['author'] = updated_post['author']
             post['content'] = updated_post['content']
             post['post_date'] = updated_post['post_date']
+            post_found = True
             break
 
-    sync_data('blog_data.json', posts_data)
+    if not post_found:
+        print(f"Post with id {updated_post['id']} not found in JSON file.")
+
+    sync_data(file_path, posts_data)
 
 
 def main():

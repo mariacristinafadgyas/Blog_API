@@ -1,3 +1,6 @@
+// Define the global variable to store the current post ID
+var currentPostId = null;
+
 // Function that runs once the window is fully loaded
 window.onload = function() {
     // Attempt to retrieve the API base URL from the local storage
@@ -27,14 +30,28 @@ function loadPosts() {
             data.forEach(post => {
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
+                postDiv.id = `post-${post.id}`;
                 postDiv.innerHTML = `<h2>${post.title}</h2>
                 <p><small>By: <strong>${post.author}</strong> on ${post.post_date}</small></p>
                 <p>${post.content}</p>
-                <button onclick="deletePost(${post.id})">Delete</button>`;
-                postContainer.appendChild(postDiv);
+                <div class="button-container">
+                        <button id="delete-post-${post.id}" class="delete" onclick="deletePost(${post.id})">Delete</button>
+                        <button id="update-post-${post.id}" class="update" onclick="prepareUpdate(${post.id}, '${post.title}', '${post.content}', '${post.author}')">Update</button>
+                </div>`;
+            postContainer.appendChild(postDiv);
             });
         })
         .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
+}
+
+// Function to prepare for updating a post
+function prepareUpdate(postId, title, content, author) {
+    currentPostId = postId;
+    document.getElementById('post-title').value = title;
+    document.getElementById('post-content').value = content;
+    document.getElementById('post-author').value = author;
+    document.getElementById('add-post-btn').style.display = 'none';
+    document.getElementById('update-post-btn').style.display = 'inline';
 }
 
 // Function to send a POST request to the API to add a new post
@@ -64,6 +81,15 @@ function addPost() {
     .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
 }
 
+// Function to clear input fields
+function clearInputs() {
+    document.getElementById('post-title').value = '';
+    document.getElementById('post-content').value = '';
+    document.getElementById('post-author').value = '';
+    document.getElementById('add-post-btn').style.display = 'inline';
+    document.getElementById('update-post-btn').style.display = 'none';
+}
+
 // Function to send a DELETE request to the API to delete a post
 function deletePost(postId) {
     var baseUrl = document.getElementById('api-base-url').value;
@@ -78,3 +104,40 @@ function deletePost(postId) {
     })
     .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
 }
+
+// Function to send a PUT request to update a post
+function updateExistingPost() {
+    const baseUrl = document.getElementById('api-base-url').value;
+    const postTitle = document.getElementById('post-title').value;
+    const postContent = document.getElementById('post-content').value;
+    const postAuthor = document.getElementById('post-author').value || 'Anonymous';
+
+    fetch(`${baseUrl}/posts/${currentPostId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: postTitle,
+            content: postContent,
+            author: postAuthor
+        })
+    })
+    .then(response => response.json())
+    .then(updatedPost => {
+        console.log('Post updated:', updatedPost);
+
+        const postDiv = document.getElementById(`post-${currentPostId}`);
+        postDiv.innerHTML = `
+            <h2>${updatedPost.title}</h2>
+            <p><small>By: <strong>${updatedPost.author}</strong> on ${updatedPost.post_date}</small></p>
+            <p>${updatedPost.content}</p>
+            <div class="button-container">
+                <button id="delete-post-${updatedPost.id}" class="delete" onclick="deletePost(${updatedPost.id})">Delete</button>
+                <button id="update-post-${post.id}" class="update" onclick="prepareUpdate(${post.id}, '${post.title.replace(/'/g, "\\'")}', '${post.content.replace(/'/g, "\\'")}', '${post.author.replace(/'/g, "\\'")}')">Update</button>
+            </div>
+        `;
+        clearInputs();
+    })
+    .catch(error => console.error('Error updating post:', error));
+}
+
+document.getElementById('update-post-btn').addEventListener('click', updateExistingPost);

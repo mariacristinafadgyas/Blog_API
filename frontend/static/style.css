@@ -49,7 +49,8 @@ body {
     margin-right: 0px;
 }
 
-.input-field input::placeholder {
+.input-field input::placeholder,
+.input-field textarea::placeholder{
     color: #aaa;
 }
 
@@ -83,11 +84,30 @@ body {
     color: #333;
 }
 
-.post button {
+.button-container {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+.post button.delete {
     background-color: #ff4444;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.post button.delete:hover {
+    background-color: #cc0000;
+}
+
+.post button.update {
+    background-color: #329c57;
     color: #fff;
     border: none;
     padding: 5px 10px;
@@ -95,6 +115,6 @@ body {
     cursor: pointer;
 }
 
-.post button:hover {
-    background-color: #cc0000;
+.post button.update:hover {
+    background-color: #27a745;
 }

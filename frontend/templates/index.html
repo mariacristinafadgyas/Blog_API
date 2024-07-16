@@ -18,7 +18,8 @@
             <input type="text" id="post-title" placeholder="Enter Post Title">
             <input type="text" id="post-author" placeholder="Enter Post Author">
             <textarea id="post-content" placeholder="Enter Post Content" rows="5" cols="20"></textarea>
-            <button onclick="addPost()">Add Post</button>
+            <button id="add-post-btn" onclick="addPost()">Add Post</button>
+            <button id="update-post-btn" style="display: none;" onclick="updateExistingPost()">Update Post</button>
         </div>
         <div id="post-container">
             <!-- Blog posts will be inserted here by JavaScript -->

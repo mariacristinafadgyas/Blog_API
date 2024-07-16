@@ -3,16 +3,11 @@ from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 from datetime import date
 from storage import *
-import os
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-current_directory = os.path.dirname(os.path.abspath(__file__))  # Define the path to posts.json
-posts_file_path = os.path.join(current_directory, '..', 'posts.json')
-# print(current_directory)
-# print(posts_file_path)
-POSTS = read_data(posts_file_path)  # Use the updated file path
+POSTS = read_data('posts.json')  # Use the updated file path
 
 
 @app.route('/api/posts', methods=['GET'])
@@ -101,6 +96,7 @@ def update(id):
             author = data.get('author', post['author'])
             post_date = date.today().strftime('%Y-%m-%d')
             updated_post = {
+                'id': id,
                 'title': title,
                 'content': content,
                 'author': author,
