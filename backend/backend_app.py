@@ -128,8 +128,8 @@ def search_posts():
                 or (author and author.lower() in post['author'].lower())
                 or (post_date and post_date == post['post_date'])):
             filtered_posts.append(post)
-        if filtered_posts:
-            return jsonify(filtered_posts), 200
+    if filtered_posts:
+        return jsonify(filtered_posts), 200
 
     error_message_parts = []
     if title:

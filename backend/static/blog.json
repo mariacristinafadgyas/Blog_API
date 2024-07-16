@@ -18,8 +18,8 @@
             "name": "sort",
             "in": "query",
             "type": "string",
-            "enum": ["title", "content"],
-            "description": "The attribute to sort by (title or content)."
+            "enum": ["title", "content", "author", "post_date"],
+            "description": "The attribute to sort by (title, content, author, or post_date)."
           },
           {
             "name": "direction",
@@ -39,7 +39,9 @@
                 "properties": {
                   "id": { "type": "integer" },
                   "title": { "type": "string" },
-                  "content": { "type": "string" }
+                  "content": { "type": "string" },
+                  "author": { "type": "string" },
+                  "post_date": { "type": "string", "format": "date" }
                 }
               }
             }
@@ -90,7 +92,9 @@
               "properties": {
                 "id": { "type": "integer" },
                 "title": { "type": "string" },
-                "content": { "type": "string" }
+                "content": { "type": "string" },
+                "author": { "type": "string" },
+                "post_date": { "type": "string", "format": "date" }
               }
             }
           },
@@ -164,7 +168,8 @@
               "type": "object",
               "properties": {
                 "title": { "type": "string", "example": "Updated Post Title" },
-                "content": { "type": "string", "example": "Updated content of the post." }
+                "content": { "type": "string", "example": "Updated content of the post." },
+                "author": { "type": "string", "example": "Updated Author" }
               }
             }
           }
@@ -193,8 +198,8 @@
     },
           "/api/posts/search": {
       "get": {
-        "summary": "Search for posts by title or content",
-        "description": "Searches for posts based on their title or content. Displays an error message if no search parameters are specified or if no matches are found.",
+        "summary": "Search for posts by title, content, author, or date",
+        "description": "Searches for posts based on their title, content, author, or post date. Returns an error message if no search parameters are provided or if no matches are found.",
         "produces": ["application/json"],
         "tags": ["Post"],
         "parameters": [
@@ -209,6 +214,18 @@
             "in": "query",
             "type": "string",
             "description": "Content of the post to search for"
+          },
+          {
+            "name": "author",
+            "in": "query",
+            "type": "string",
+            "description": "Author of the post to search for"
+          },
+          {
+            "name": "post_date",
+            "in": "query",
+            "type": "string",
+            "description": "Post date of the post to search for in YYYY-MM-DD format"
           }
         ],
         "responses": {
@@ -221,7 +238,9 @@
                 "properties": {
                   "id": { "type": "integer" },
                   "title": { "type": "string" },
-                  "content": { "type": "string" }
+                  "content": { "type": "string" },
+                  "author": { "type": "string" },
+                  "post_date": { "type": "string", "format": "date" }
                 }
               }
             }
