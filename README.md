@@ -38,10 +38,10 @@ source venv/bin/activate   # On Windows use `venv\Scripts\activate`
 
 4. Run the application:
 ```
-   python backend_app.py
+   python backend/backend_app.py
 ```
 ```
-   python frontend_app.py
+   python frontend/frontend_app.py
 ```
 The API for the frontend will be available at http://localhost:5001, and the backend will be available at http://localhost:5002.
 
