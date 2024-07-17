@@ -52,6 +52,7 @@ function prepareUpdate(postId, title, content, author) {
     document.getElementById('post-author').value = author;
     document.getElementById('add-post-btn').style.display = 'none';
     document.getElementById('update-post-btn').style.display = 'inline';
+    window.scrollTo(0,0)
 }
 
 // Function to send a POST request to the API to add a new post
@@ -83,6 +84,7 @@ function addPost() {
 
 // Function to clear input fields
 function clearInputs() {
+    console.log("Hahaha")
     document.getElementById('post-title').value = '';
     document.getElementById('post-content').value = '';
     document.getElementById('post-author').value = '';
@@ -121,23 +123,15 @@ function updateExistingPost() {
             author: postAuthor
         })
     })
-    .then(response => response.json())
-    .then(updatedPost => {
-        console.log('Post updated:', updatedPost);
-
-        const postDiv = document.getElementById(`post-${currentPostId}`);
-        postDiv.innerHTML = `
-            <h2>${updatedPost.title}</h2>
-            <p><small>By: <strong>${updatedPost.author}</strong> on ${updatedPost.post_date}</small></p>
-            <p>${updatedPost.content}</p>
-            <div class="button-container">
-                <button id="delete-post-${updatedPost.id}" class="delete" onclick="deletePost(${updatedPost.id})">Delete</button>
-                <button id="update-post-${post.id}" class="update" onclick="prepareUpdate(${post.id}, '${post.title.replace(/'/g, "\\'")}', '${post.content.replace(/'/g, "\\'")}', '${post.author.replace(/'/g, "\\'")}')">Update</button>
-            </div>
-        `;
+    .then(response => response.json())  // Parse the JSON data from the response
+    .then(post => {
+        console.log('Post added:', post);
+        console.log('post-'+ post.post_id)
+        const targetDiv = document.getElementById('post-'+ post.post_id)
+        targetDiv.scrollIntoView()
         clearInputs();
+        loadPosts(); // Reload the posts after adding a new one
     })
+
     .catch(error => console.error('Error updating post:', error));
 }
-
-document.getElementById('update-post-btn').addEventListener('click', updateExistingPost);

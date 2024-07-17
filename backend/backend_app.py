@@ -7,14 +7,13 @@ from storage import *
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-POSTS = read_data('posts.json')  # Use the updated file path
-
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
     """Returns a JSON file containing the list of blog posts. Optionally, it
      can sort the list of posts according to the specified attribute and
       direction."""
+    POSTS = read_data('posts.json')  # Use the updated file path
     sort = request.args.get('sort')
     direction = request.args.get('direction')
 
@@ -54,6 +53,7 @@ def add_post():
     """Creates a new blog entry. Expects both title and content. If these are
      specified, the new post will be returned or an error if the input is
       invalid."""
+    POSTS = read_data('posts.json')  # Use the updated file path
     data = request.get_json()
     if not data or not 'title' in data or not 'content' in data:
         return jsonify({'error': 'Both title and content are required'}), 400
@@ -76,6 +76,7 @@ def delete_post(id):
     """Deletes a post based on the ID specified in the URL. If the post
      exists, it is deleted, if it does not exist, an error message is
       returned."""
+    POSTS = read_data('posts.json')  # Use the updated file path
     for post in POSTS:
         if post['id'] == id:
             POSTS.remove(post)
@@ -88,6 +89,7 @@ def delete_post(id):
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def update(id):
     """Updates an existing blog post with a new title or content."""
+    POSTS = read_data('posts.json')  # Use the updated file path
     data = request.get_json()
     for post in POSTS:
         if post['id'] == id:
@@ -105,7 +107,7 @@ def update(id):
             post.update(updated_post)
             update_post_in_json('posts.json', updated_post)
             return jsonify({"message": f"Post with id {id} has been updated "
-                                       f"successfully."}), 200
+                                       f"successfully.", "post_id": id}), 200
     return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
@@ -113,6 +115,7 @@ def update(id):
 def search_posts():
     """Searches for posts based on their title or content. Displays an error
      message if no search parameters are specified or if no matches are found."""
+    POSTS = read_data('posts.json')  # Use the updated file path
     title = request.args.get('title')
     content = request.args.get('content')
     author = request.args.get('author')
