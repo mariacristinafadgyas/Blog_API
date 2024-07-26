@@ -80,9 +80,9 @@ def delete_post(id):
     for post in POSTS:
         if post['id'] == id:
             POSTS.remove(post)
+            sync_data('posts.json', POSTS)
             return jsonify({"message": f"Post with id {id} has been deleted"
                                        f" successfully."}), 200
-    sync_data('posts.json', POSTS)
     return jsonify({"message": f"Post with id {id} not found."}), 404
 
 
