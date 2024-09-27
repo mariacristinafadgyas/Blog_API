@@ -1,3 +1,4 @@
+const deployedUrl = 'https://blog-api-backend-vyir.onrender.com/api'
 // Define the global variable to store the current post ID
 var currentPostId = null;
 
@@ -19,7 +20,7 @@ function loadPosts() {
     localStorage.setItem('apiBaseUrl', baseUrl);
 
     // Use the Fetch API to send a GET request to the /posts endpoint
-    fetch(baseUrl + '/posts')
+    fetch(deployedUrl + '/posts')
         .then(response => response.json())  // Parse the JSON data from the response
         .then(data => {  // Once the data is ready, we can use it
             // Clear out the post container first
@@ -65,7 +66,7 @@ function addPost() {
     var postDate = new Date().toISOString().split('T')[0];  // Formats the date as 'YYYY-MM-DD'
 
     // Use the Fetch API to send a POST request to the /posts endpoint
-    fetch(baseUrl + '/posts', {
+    fetch(deployedUrl + '/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -97,7 +98,7 @@ function deletePost(postId) {
     var baseUrl = document.getElementById('api-base-url').value;
 
     // Use the Fetch API to send a DELETE request to the specific post's endpoint
-    fetch(baseUrl + '/posts/' + postId, {
+    fetch(deployedUrl + '/posts/' + postId, {
         method: 'DELETE'
     })
     .then(response => {
@@ -114,7 +115,7 @@ function updateExistingPost() {
     const postContent = document.getElementById('post-content').value;
     const postAuthor = document.getElementById('post-author').value || 'Anonymous';
 
-    fetch(`${baseUrl}/posts/${currentPostId}`, {
+    fetch(`${deployedUrl}/posts/${currentPostId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
