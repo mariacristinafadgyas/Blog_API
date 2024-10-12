@@ -1,4 +1,4 @@
-const deployedUrl = 'https://blog-api-backend-vyir.onrender.com/api'
+const deployedUrl = 'https://blog-api-backend-h475.onrender.com/api'
 // Define the global variable to store the current post ID
 var currentPostId = null;
 
